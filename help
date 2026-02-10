@@ -1,0 +1,180 @@
+ curl --location 'https://api.cerebras.ai/v1/chat/completions' \
+  --header 'Content-Type: application/json' \
+  --header "Authorization: Bearer ${CEREBRAS_API_KEY}" \
+  --data '{
+    "model": "llama-3.3-70b",
+    "max_completion_tokens": 1024,
+    "temperature": 0.2,
+    "top_p": 1,
+    "stream": false,
+    "messages": [
+    {
+      "role": "user",
+      "content": "Why is fast inference important?"
+    }
+  ]
+  }'  api csk-p64xm6p5hy323v85nfcknw9jt8vpd9h929v225xy2392mfdh
+
+   every avauable model use best to worst Unlock higher rate limits when you opt-in to pay-as-you-go. 
+Add credits now →
+Model	Max Context Length	Type	Quota
+gpt-oss-120b
+Production
+65,536	Requests	
+minute:
+30
+hour:
+900
+day:
+14,400
+Tokens	
+minute:
+64,000
+hour:
+1,000,000
+day:
+1,000,000
+llama-3.3-70b
+Production
+65,536	Requests	
+minute:
+30
+hour:
+900
+day:
+14,400
+Tokens	
+minute:
+64,000
+hour:
+1,000,000
+day:
+1,000,000
+llama3.1-8b
+Production
+8,192	Requests	
+minute:
+30
+hour:
+900
+day:
+14,400
+Tokens	
+minute:
+60,000
+hour:
+1,000,000
+day:
+1,000,000
+qwen-3-32b
+Production
+65,536	Requests	
+minute:
+30
+hour:
+900
+day:
+14,400
+Tokens	
+minute:
+64,000
+hour:
+1,000,000
+day:
+1,000,000
+zai-glm-4.7
+Preview
+64,000	Requests	
+minute:
+10
+hour:
+100
+day:
+100
+Tokens	
+minute:
+60,000
+hour:
+1,000,000
+day:
+1,000,000
+Please note:
+You may experience rate limits over shorter time intervals. For example, a rate limit of 60 requests per minute (RPM) may be enforced as 1 requests per second. This also helps us mitigate against misuse and make sure everybody gets fair access to the platform.  \
+
+
+here is custom google search engine stuff Overview
+Basic
+Search engine name
+chatra
+edit
+Description
+Add description
+Code
+Get code
+Search engine ID
+b1ce43aa4c8ce4521
+Public URL
+https://cse.google.com/cse?cx=b1ce43aa4c8ce4521
+
+Search Features
+Search settings
+
+Image search
+
+SafeSearch
+Augment results
+
+Search the entire web
+Region
+All regions
+Region restricted results
+
+Sites to search
+You do not have sites to search.
+Sites to exclude
+You do not have excluded sites.
+Upload/Download Annotations in XML files
+Upload/Download Search Engine context in XML files
+
+Look and Feel
+Language
+All languages
+Layout
+Overlay
+Theme
+Default
+
+Members
+Member	Role	Verified
+
+modmojheh@gmail.com (me)	Owner	Yes
+1‑1 of 1
+
+Ads
+Nonprofit organizations, accredited educational institutions, and government agencies may qualify for a free version of Programmable Search Engine without ads. Learn more 
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCk2pBTvSiWdXfX4k5mYGGJJMxQUBvk5W0",
+    authDomain: "akanator-17686.firebaseapp.com",
+    projectId: "akanator-17686",
+    storageBucket: "akanator-17686.firebasestorage.app",
+    messagingSenderId: "632124715829",
+    appId: "1:632124715829:web:d99672bba9a93ade74d27c",
+    measurementId: "G-79CWCMX2JJ"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+
+ also the firebas could be used to make the ai smarter and friebase for stored charcters and more

@@ -1,0 +1,14 @@
+{
+  "name": "akanator",
+  "version": "1.0.0",
+  "description": "AI-powered Akinator clone - Cloudflare Worker",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}

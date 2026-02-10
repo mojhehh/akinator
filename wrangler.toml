@@ -1,0 +1,10 @@
+name = "akanator"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+
+[vars]
+CEREBRAS_API_KEY = "csk-p64xm6p5hy323v85nfcknw9jt8vpd9h929v225xy2392mfdh"
+GOOGLE_CSE_ID = "b1ce43aa4c8ce4521"
+GOOGLE_API_KEY = "AIzaSyDio6gNPo1FZgoJ9KwwsLfPXNcewmbGrJE"
+FIREBASE_PROJECT_ID = "akanator-17686"
+FIREBASE_DB_URL = "https://akanator-17686-default-rtdb.firebaseio.com"
