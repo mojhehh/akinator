@@ -47,8 +47,9 @@ export default {
 
       // Start a new game session
       if (path === '/api/start' && request.method === 'POST') {
-        const body = await request.json();
-        const category = body.category || 'any'; // characters, animals, objects, any
+        const body = await safeParseJSON(request);
+        if (!body) return jsonResponse({ error: 'Invalid JSON body' }, corsHeaders, 400);
+        const category = body.category || 'any';
         const result = await handleAIInit(env, category);
         await firebaseIncrementStats(env, 'gamesStarted');
         return jsonResponse(result, corsHeaders);
@@ -56,23 +57,28 @@ export default {
 
       // Send answer and get next question
       if (path === '/api/answer' && request.method === 'POST') {
-        const body = await request.json();
-        // body: { history: [...], answer: "yes/no/probably/probably not/dont know", questionNumber: N }
+        const body = await safeParseJSON(request);
+        if (!body) return jsonResponse({ error: 'Invalid JSON body' }, corsHeaders, 400);
+        if (!body.history || !body.answer) return jsonResponse({ error: 'Missing required fields: history, answer' }, corsHeaders, 400);
         const result = await handleAIQuestion(env, body);
         return jsonResponse(result, corsHeaders);
       }
 
       // AI makes a guess
       if (path === '/api/guess' && request.method === 'POST') {
-        const body = await request.json();
+        const body = await safeParseJSON(request);
+        if (!body) return jsonResponse({ error: 'Invalid JSON body' }, corsHeaders, 400);
+        if (!body.history) return jsonResponse({ error: 'Missing required field: history' }, corsHeaders, 400);
         const result = await handleAIGuess(env, body);
         return jsonResponse(result, corsHeaders);
       }
 
       // Search for character info + images
       if (path === '/api/search' && request.method === 'POST') {
-        const body = await request.json();
+        const body = await safeParseJSON(request);
+        if (!body) return jsonResponse({ error: 'Invalid JSON body' }, corsHeaders, 400);
         const characterName = body.character;
+        if (!characterName) return jsonResponse({ error: 'Missing required field: character' }, corsHeaders, 400);
         const [info, images] = await Promise.all([
           searchCharacter(env, characterName),
           searchCharacterImages(env, characterName),
@@ -82,7 +88,8 @@ export default {
 
       // Save a game result to Firebase
       if (path === '/api/save-game' && request.method === 'POST') {
-        const body = await request.json();
+        const body = await safeParseJSON(request);
+        if (!body) return jsonResponse({ error: 'Invalid JSON body' }, corsHeaders, 400);
         const result = await firebaseSaveGame(env, body);
         await firebaseIncrementStats(env, body.won ? 'gamesWon' : 'gamesLost');
         // If won, save Q&A patterns for learning
@@ -94,7 +101,9 @@ export default {
 
       // Save a new character the AI didn't know
       if (path === '/api/learn' && request.method === 'POST') {
-        const body = await request.json();
+        const body = await safeParseJSON(request);
+        if (!body) return jsonResponse({ error: 'Invalid JSON body' }, corsHeaders, 400);
+        if (!body.name) return jsonResponse({ error: 'Missing required field: name' }, corsHeaders, 400);
         const result = await firebaseSaveCharacter(env, body);
         await firebaseIncrementStats(env, 'charactersLearned');
         return jsonResponse(result, corsHeaders);
@@ -131,6 +140,14 @@ function jsonResponse(data, corsHeaders, status = 200) {
     status,
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
+}
+
+async function safeParseJSON(request) {
+  try {
+    return await request.json();
+  } catch {
+    return null;
+  }
 }
 
 async function firebaseGetStats(env) {

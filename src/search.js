@@ -11,7 +11,7 @@ export async function searchCharacter(env, characterName) {
     const url = `${GOOGLE_SEARCH_URL}?key=${env.GOOGLE_API_KEY}&cx=${env.GOOGLE_CSE_ID}&q=${query}&num=5`;
 
     console.log('[Search] Searching for:', characterName);
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) {
       const errBody = await res.text();
       console.error('[Search] API error:', res.status, errBody);
@@ -40,7 +40,7 @@ export async function searchCharacterImages(env, characterName) {
     const url = `${GOOGLE_SEARCH_URL}?key=${env.GOOGLE_API_KEY}&cx=${env.GOOGLE_CSE_ID}&q=${query}&searchType=image&num=6&safe=active`;
 
     console.log('[ImageSearch] Searching images for:', characterName);
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     
     if (res.ok) {
       const data = await res.json();
@@ -83,7 +83,10 @@ async function getWikipediaImages(query) {
   try {
     // Search Wikipedia for the page
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&srlimit=1`;
-    const searchRes = await fetch(searchUrl);
+    const searchRes = await fetch(searchUrl, {
+      headers: { 'User-Agent': 'Akanator/1.0 (Cloudflare Worker)' },
+      signal: AbortSignal.timeout(5000),
+    });
     if (!searchRes.ok) return [];
     
     const searchData = await searchRes.json();
@@ -94,7 +97,10 @@ async function getWikipediaImages(query) {
     
     // Get images from the page
     const imgUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages|images&pithumbsize=500&format=json`;
-    const imgRes = await fetch(imgUrl);
+    const imgRes = await fetch(imgUrl, {
+      headers: { 'User-Agent': 'Akanator/1.0 (Cloudflare Worker)' },
+      signal: AbortSignal.timeout(5000),
+    });
     if (!imgRes.ok) return [];
     
     const imgData = await imgRes.json();

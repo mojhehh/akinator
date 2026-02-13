@@ -271,15 +271,18 @@ REMEMBER: If your confidence is above 75% and you have a specific entity in mind
   const result = await callCerebras(env, messages, 0.1);
   const parsed = parseJSON(result.content);
 
-  // SANITIZE: Strip any character/entity names from the question
+  // SANITIZE: Strip any character/entity names from the question (word-boundary match only)
   if (parsed.question && parsed.topGuesses && parsed.topGuesses.length > 0) {
     let q = parsed.question;
     for (const guess of parsed.topGuesses) {
-      if (guess && q.toLowerCase().includes(guess.toLowerCase())) {
-        console.log(`[AI] CAUGHT: Question contained guess name "${guess}"`);
-        const regex = new RegExp(guess.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        q = q.replace(regex, 'it').replace(/Is it it/gi, 'Is it').replace(/the it/gi, 'it');
-        parsed.question = q;
+      if (guess && guess.length >= 2) {
+        const escaped = guess.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('\\b' + escaped + '\\b', 'gi');
+        if (regex.test(q)) {
+          console.log(`[AI] CAUGHT: Question contained guess name "${guess}"`);
+          q = q.replace(regex, 'it').replace(/Is it it/gi, 'Is it').replace(/the it/gi, 'it');
+          parsed.question = q;
+        }
       }
     }
   }
@@ -695,8 +698,21 @@ function parseJSON(text) {
 }
 
 function trimHistory(history) {
-  if (history.length <= 42) return history;
+  // Keep system prompt + all user answers (critical for constraints) + recent assistant messages
+  if (history.length <= 60) return history;
   const system = history[0];
-  const recent = history.slice(-40);
-  return [system, ...recent];
+  // Preserve all user "Answer:" messages so constraints are never lost
+  const userAnswers = history.filter(m => m.role === 'user' && m.content && m.content.startsWith('Answer:'));
+  const recent = history.slice(-30);
+  // Merge: system + any old user answers not in recent + recent
+  const recentSet = new Set(recent.map(m => m.content));
+  const missingAnswers = userAnswers.filter(m => !recentSet.has(m.content));
+  // Also keep the assistant message before each missing answer for context
+  const preserved = [];
+  for (const ans of missingAnswers) {
+    const idx = history.indexOf(ans);
+    if (idx > 0) preserved.push(history[idx - 1]);
+    preserved.push(ans);
+  }
+  return [system, ...preserved, ...recent];
 }

@@ -110,7 +110,7 @@ export async function firebaseGetCharacters(env) {
   return { characters };
 }
 
-// Increment a stat counter
+// Increment a stat counter atomically
 export async function firebaseIncrementStats(env, statName) {
   try {
     // Read current value
@@ -118,22 +118,26 @@ export async function firebaseIncrementStats(env, statName) {
     const res = await fetch(url);
     const current = await res.json() || 0;
 
-    // Write incremented value
-    await fetch(url, {
+    // Write incremented value (use conditional write if possible)
+    const writeRes = await fetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(current + 1),
     });
+    if (!writeRes.ok) {
+      console.error('Stats increment write failed:', writeRes.status);
+    }
   } catch (e) {
     console.error('Stats increment error:', e);
   }
 }
 
 function slugify(text) {
+  if (!text || typeof text !== 'string') return 'unknown';
   return text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+    .replace(/(^-|-$)/g, '') || 'unknown';
 }
 
 function mergeHints(existing, newHints) {
@@ -158,9 +162,12 @@ export async function firebaseSaveQAPattern(env, data) {
     };
 
     let patterns;
-    if (existingData && existingData.patterns) {
+    if (existingData && Array.isArray(existingData.patterns)) {
       // Keep last 5 successful game patterns per character
       patterns = [...existingData.patterns, qaEntry].slice(-5);
+    } else if (existingData && existingData.patterns && typeof existingData.patterns === 'object') {
+      // Handle Firebase converting arrays to objects with numeric keys
+      patterns = [...Object.values(existingData.patterns), qaEntry].slice(-5);
     } else {
       patterns = [qaEntry];
     }

@@ -1038,7 +1038,7 @@ export function getHTML(env) {
       const splash = document.getElementById('splashScreen');
       if (splash) {
         setTimeout(function() {
-          splash.style.display = 'none';
+          splash.remove();
           document.body.classList.remove('splash-active');
         }, 3500);
       }
@@ -1152,7 +1152,10 @@ export function getHTML(env) {
     // ============================================================
     // ANSWER A QUESTION
     // ============================================================
+    let isAnswering = false;
     async function answer(ans) {
+      if (isAnswering) return;
+      isAnswering = true;
       showLoading('loadingQuestion', true);
       hideElement('answersArea');
 
@@ -1194,6 +1197,7 @@ export function getHTML(env) {
 
       showLoading('loadingQuestion', false);
       showElement('answersArea');
+      isAnswering = false;
     }
 
     // ============================================================
@@ -1277,7 +1281,7 @@ export function getHTML(env) {
         }),
       }).catch(e => console.error('Save game error:', e));
 
-      // Save the character
+      // Save the character (don't increment charactersLearned — server already does it)
       fetch('/api/learn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1335,15 +1339,11 @@ export function getHTML(env) {
           });
           document.getElementById('resultImages').style.display = 'block';
         } else {
-          // Even if no API images, try a simple fallback
-          const gallery = document.getElementById('resultGallery');
-          gallery.innerHTML = '';
-          const fallbackImg = document.createElement('img');
-          fallbackImg.className = 'gallery-img';
-          fallbackImg.src = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(gameState.currentGuess) + '&prop=pageimages&pithumbsize=400&format=json';
-          // Use a Wikipedia page image as last resort
+          // Try Wikipedia image as last resort
           fetchWikiImage(gameState.currentGuess).then(url => {
             if (url) {
+              const gallery = document.getElementById('resultGallery');
+              gallery.innerHTML = '';
               const img = document.createElement('img');
               img.className = 'gallery-img';
               img.src = url;
@@ -1364,7 +1364,15 @@ export function getHTML(env) {
           results.forEach(r => {
             const div = document.createElement('div');
             div.className = 'search-result';
-            div.innerHTML = '<a href="' + r.link + '" target="_blank">' + escapeHtml(r.title) + '</a><p>' + escapeHtml(r.snippet) + '</p>';
+            const a = document.createElement('a');
+            a.href = r.link;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = r.title;
+            const p = document.createElement('p');
+            p.textContent = r.snippet;
+            div.appendChild(a);
+            div.appendChild(p);
             searchDiv.appendChild(div);
           });
           document.getElementById('resultSearchInfo').style.display = 'block';
@@ -1454,6 +1462,17 @@ export function getHTML(env) {
       document.getElementById('resultImages').style.display = 'none';
       document.getElementById('resultSearchInfo').style.display = 'none';
       document.getElementById('altGuessesArea').style.display = 'none';
+      // Reset the learn form back to original state
+      const learnForm = document.getElementById('learnForm');
+      if (learnForm) {
+        learnForm.innerHTML = 
+          '<h3>\uD83E\uDDE0 Teach Me</h3>' +
+          '<div class="form-group"><label>Who/What were you thinking of?</label><input type="text" id="learnName" placeholder="e.g. SpongeBob SquarePants"></div>' +
+          '<div class="form-group"><label>Category</label><select id="learnCategory"><option value="fictional-character">Fictional Character</option><option value="real-person">Real Person</option><option value="animal">Animal</option><option value="object">Object</option><option value="place">Place</option><option value="other">Other</option></select></div>' +
+          '<div class="form-group"><label>Brief description</label><textarea id="learnDescription" rows="2" placeholder="e.g. Yellow cartoon sponge who lives under the sea"></textarea></div>' +
+          '<div class="form-group"><label>A key characteristic I should have asked about</label><input type="text" id="learnHint" placeholder="e.g. Lives underwater"></div>' +
+          '<button class="btn btn-primary" onclick="submitLearn()" style="width:100%; justify-content:center;">\uD83D\uDCDA Teach Akanator</button>';
+      }
       showScreen('welcome');
     }
 
