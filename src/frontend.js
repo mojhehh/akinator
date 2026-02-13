@@ -755,9 +755,42 @@ export function getHTML(env) {
       .guess-actions { flex-direction: column; }
       .stats-bar { gap: 12px; }
     }
+
+    /* Splash Screen */
+    #splashScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      opacity: 0;
+      animation: splashFadeIn 1s ease forwards, splashFadeOut 1s ease 2.5s forwards;
+    }
+    #splashScreen img {
+      max-width: 250px;
+      max-height: 250px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 40px rgba(108,60,224,0.5));
+    }
+    @keyframes splashFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes splashFadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; pointer-events: none; }
+    }
+    body.splash-active { overflow: hidden; }
   </style>
 </head>
-<body>
+<body class="splash-active">
+  <!-- Splash Screen -->
+  <div id="splashScreen">
+    <img src="/assets/logo.png" alt="Akanator">
+  </div>
   <!-- Background Effects -->
   <div class="bg-effects">
     <div class="orb"></div>
@@ -999,6 +1032,17 @@ export function getHTML(env) {
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
+    // Splash screen removal
+    (function() {
+      const splash = document.getElementById('splashScreen');
+      if (splash) {
+        setTimeout(function() {
+          splash.style.display = 'none';
+          document.body.classList.remove('splash-active');
+        }, 3500);
+      }
+    })();
+
     // ============================================================
     // FIREBASE INIT - Realtime sync
     // ============================================================

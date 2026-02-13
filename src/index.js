@@ -7,6 +7,7 @@ import { handleAIQuestion, handleAIGuess, handleAIInit } from './ai.js';
 import { searchCharacter, searchCharacterImages } from './search.js';
 import { firebaseSaveGame, firebaseGetLeaderboard, firebaseSaveCharacter, firebaseGetCharacters, firebaseIncrementStats, firebaseSaveQAPattern } from './firebase.js';
 import { getHTML } from './frontend.js';
+import { LOGO_BASE64, LOGO_MIME } from './logo-data.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -31,6 +32,16 @@ export default {
       if (path === '/' || path === '/index.html') {
         return new Response(getHTML(env), {
           headers: { 'Content-Type': 'text/html; charset=utf-8', ...corsHeaders },
+        });
+      }
+
+      // Serve logo image
+      if (path === '/assets/logo.png') {
+        const binaryStr = atob(LOGO_BASE64);
+        const bytes = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+        return new Response(bytes, {
+          headers: { 'Content-Type': LOGO_MIME, 'Cache-Control': 'public, max-age=31536000', ...corsHeaders },
         });
       }
 

@@ -14,6 +14,8 @@ fixed = fixed.replace(/fetch\(`\/api\//g, `fetch(\`${WORKER_URL}/api/`);
 // Replace fetch("/api/... with fetch("WORKER_URL/api/...
 fixed = fixed.replace(/fetch\("\/api\//g, `fetch("${WORKER_URL}/api/`);
 
+// Replace logo path for GitHub Pages (local file in docs/)
+fixed = fixed.replace(/src="\/assets\/logo\.png"/g, 'src="logo.png"');
 fs.mkdirSync('docs', { recursive: true });
 fs.writeFileSync('docs/index.html', fixed);
 console.log('Created docs/index.html -', fixed.length, 'bytes');
