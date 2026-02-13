@@ -766,18 +766,19 @@ export function getHTML(env) {
       align-items: center;
       justify-content: center;
       z-index: 99999;
-      opacity: 0;
-      animation: splashFadeIn 1s ease forwards, splashFadeOut 1s ease 2.5s forwards;
+      opacity: 1;
+      animation: splashFadeOut 1s ease 2.5s forwards;
     }
     #splashScreen img {
       max-width: 250px;
-      max-height: 250px;
       object-fit: contain;
+      opacity: 0;
+      animation: splashLogoIn 1s ease forwards;
       filter: drop-shadow(0 0 40px rgba(108,60,224,0.5));
     }
-    @keyframes splashFadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+    @keyframes splashLogoIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
     }
     @keyframes splashFadeOut {
       from { opacity: 1; }
